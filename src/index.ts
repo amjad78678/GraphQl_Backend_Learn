@@ -53,7 +53,7 @@ async function startServer() {
           }: { name: string; email: string; password: string; age: number }
         ) => {
           const userExists = await User.findOne({ email });
-          if(userExists) return false
+          if (userExists) return false;
           const user = await User.create({ name, email, password, age });
           if (!user) return false;
           return true;
