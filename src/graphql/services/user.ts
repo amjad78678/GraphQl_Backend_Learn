@@ -42,10 +42,6 @@ class UserService {
   }
 
   public static async getCurrentLoggedInUser(context: any) {
-    console.log("iam context", context);
-    if (!context.user) {
-      throw new Error("I dont know who is the user?");
-    }
     const user = await userModel.findOne({ _id: context.user._id });
     return user;
   }
