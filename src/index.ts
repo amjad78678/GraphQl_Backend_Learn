@@ -1,22 +1,32 @@
 import dotenv from "dotenv";
 dotenv.config();
+
 import express from "express";
 import { ApolloServer } from "@apollo/server";
 import { expressMiddleware } from "@apollo/server/express4";
+import { connectDB } from "./config/dbConnect";
+import User from "./models/userModel";
 
 async function startServer() {
+  await connectDB();
   //Create GraphQl Server
   const gqlServer = new ApolloServer({
     typeDefs: ` 
 
         type User {
           name: String
-          number: String
+          email: String
+          password: String
         }
+
         type Query {
-            fetchUserData(userId: String): User
             hello: String
+            fetchUserData(userId: String): User
             amjData(name: String): String
+        }
+
+        type Mutation {
+          createUser(name: String!, email: String!, password: String!, age: Int): Boolean
         }
 
     `, //Schema
@@ -29,6 +39,24 @@ async function startServer() {
             name: `Enter name amjad ente id ${userId}`,
             number: "7306149125",
           };
+        },
+      },
+
+      Mutation: {
+        createUser: async (
+          _,
+          {
+            name,
+            email,
+            password,
+            age,
+          }: { name: string; email: string; password: string; age: number }
+        ) => {
+          const userExists = await User.findOne({ email });
+          if(userExists) return false
+          const user = await User.create({ name, email, password, age });
+          if (!user) return false;
+          return true;
         },
       },
     },
